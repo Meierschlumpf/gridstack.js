@@ -638,7 +638,7 @@ export class GridStack {
             addAndRemove(this, n, false);
           } else {
             removed.push(n); // batch keep track
-            this.removeWidget(n.el, true, false);
+            this.removeWidget(n.el, false, false);
           }
         }
       });
@@ -835,13 +835,13 @@ export class GridStack {
   public destroy(removeDOM = true): GridStack {
     if (!this.el) return; // prevent multiple calls
     this._updateWindowResizeEvent(true);
-    this.setStatic(true, false); // permanently removes DD but don't set CSS class (we're going away)
+    this.setStatic(false, false); // permanently removes DD but don't set CSS class (we're going away)
     this.setAnimation(false);
     if (!removeDOM) {
-      this.removeAll(removeDOM);
+      this.removeAll(false);
       this.el.classList.remove(this._styleSheetClass);
     } else {
-      this.el.parentNode.removeChild(this.el);
+      //this.el.parentNode.removeChild(this.el);
     }
     this._removeStylesheet();
     this.el.removeAttribute('gs-current-row');
@@ -1009,7 +1009,8 @@ export class GridStack {
    * @param removeDOM if `false` DOM element won't be removed from the tree (Default? true).
    * @param triggerEvent if `false` (quiet mode) element will not be added to removed list and no 'removed' callbacks will be called (Default? true).
    */
-  public removeWidget(els: GridStackElement, removeDOM = true, triggerEvent = true): GridStack {
+  public removeWidget(els: GridStackElement, removeDOM = false, triggerEvent = true): GridStack {
+    removeDOM = false;
     GridStack.getElements(els).forEach(el => {
       if (el.parentElement && el.parentElement !== this.el) return; // not our child!
       let node = el.gridstackNode;
@@ -1040,7 +1041,8 @@ export class GridStack {
    * Removes all widgets from the grid.
    * @param removeDOM if `false` DOM elements won't be removed from the tree (Default? `true`).
    */
-  public removeAll(removeDOM = true): GridStack {
+  public removeAll(removeDOM = false): GridStack {
+    removeDOM = false;
     // always remove our DOM data (circular link) before list gets emptied and drag&drop permanently
     this.engine.nodes.forEach(n => {
       delete n.el.gridstackNode;
